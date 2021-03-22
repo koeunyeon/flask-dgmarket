@@ -1,0 +1,54 @@
+# 프로젝트 루트.
+~/monolithic
+
+# virtualenv 생성
+cd monolithic
+
+pip install virtualenv
+virtualenv venv
+
+# virtualenv 활성화
+## windows
+venv\Scripts\activate
+
+## linux
+. venve/bin/activate
+
+# 의존성 설치
+pip install flask
+pip install flask_migrate
+pip install flask-SQLAlchemy
+
+# 데이터베이스 관련 처리
+## 환경 설정
+```
+cd ~/monolithic
+
+set FLASK_APP=dgmarket
+set FLASK_ENV=development
+```
+
+## 마이그레이션 초기화
+```
+flask db init
+```
+
+## 마이그레이션 생성. 모델에서 마이그레이션 파일을 생성함.
+```
+flask db migrate
+```
+
+## 실제 테이블 생성
+```
+flask db upgrade
+```
+
+# 웹서버 실행
+cd ~/monolithic
+
+set FLASK_APP=dgmarket
+set FLASK_ENV=development
+flask run
+
+# pytest 설치
+pip install pytest
