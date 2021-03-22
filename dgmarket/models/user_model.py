@@ -3,7 +3,6 @@ import datetime
 from .. import db
 from ..common.modelbase import ModelBase
 
-from ..common import utils
 
 class User(ModelBase):
     __tablename__ = 'users'
@@ -15,15 +14,3 @@ class User(ModelBase):
         db.DateTime, default=datetime.datetime.now)
     # 회원 가입 인증 완료.
     regist_auth_complete_yn = db.Column(db.String(1), default='N')
-
-    @classmethod
-    def exist_login_email(cls, login_email):
-        return cls.exist(login_email=login_email)
-
-    @classmethod
-    def exist_nickname(cls, nickname):
-        return cls.exist(nickname=nickname)
-
-    def regist(self):
-        self.regist_auth_key = utils.generate_random_key(10)
-        return self
