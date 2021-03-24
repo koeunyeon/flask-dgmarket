@@ -16,7 +16,7 @@ venv\Scripts\activate
 
 # 의존성 설치
 pip install flask
-pip install flask_migrate
+pip install flask-migrate
 pip install flask-SQLAlchemy
 
 # 데이터베이스 관련 처리

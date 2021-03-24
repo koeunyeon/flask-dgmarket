@@ -12,7 +12,7 @@ def client():
     yield client
 
 
-@pytest.fixture(autouse=True, scope="function")  # 세션 레벨에서 사용.
+@pytest.fixture(autouse=True, scope="function")  # 함수 레벨에서 사용.
 def setup_teardown():
     with dgmarket.create_app().app_context():
         # setup
@@ -105,3 +105,30 @@ def test_api_회원가입_저장_실패_닉네임_중복(client):
     response_data = result.get_json()
     assert not response_data['result']
     assert '이미 존재하는 별명입니다.' in response_data['message']     
+
+def test_api_회원가입_인증(client):
+    # given
+    given_data = dict(
+        login_email="key@koeunyeon.com",
+        nickname='고은연'
+    )
+    given_data = json.dumps(given_data)
+    given_result = client.post("/user/regist", data=given_data,
+                         content_type='application/json')
+
+    given_response_data = given_result.get_json()
+    auth_key = given_response_data['auth_key']
+    user_id = given_response_data['user_id']
+
+    # when
+    verify_url = f"/user/regist/verify/{user_id}/{auth_key}"
+    verify_result = client.get(verify_url)
+    
+    #print (verify_result.get_data())
+
+    # then
+    assert verify_result.status_code == 200
+
+    user = User.find(user_id)
+    assert user.regist_auth_complete_yn == 'Y'
+
