@@ -14,3 +14,10 @@ class User(ModelBase):
         db.DateTime, default=datetime.datetime.now)
     # 회원 가입 인증 완료.
     regist_auth_complete_yn = db.Column(db.String(1), default='N')
+
+    # 로그인 임시 키
+    login_auth_key = db.Column(db.String(15))
+    
+    # 로그인키 보낸 시간.
+    login_auth_send_date = db.Column(db.DateTime)
+        

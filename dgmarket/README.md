@@ -67,3 +67,15 @@ flask db upgrade
 
 # 단위 테스트
 python -m pytest tests -v -rP
+
+# 모델이 변경되어서 db upgrade 한 번 더 했음.
+set FLASK_ENV=development
+flask db migrate
+flask db upgrade
+
+set FLASK_ENV=test
+flask db migrate
+flask db upgrade
+둘 다 해야 함.
+
+DB 스키마가 변경되었으므로 flask db migrate도 필요함

@@ -1,3 +1,4 @@
+import datetime
 from flask import Blueprint, request, render_template, abort
 
 from ..models.user_model import User
@@ -8,15 +9,12 @@ from ..common import utils
 bp = Blueprint('user', __name__, url_prefix='/user')
 
 # 회원 가입 폼.
-
-
 @bp.route("/regist", methods=["GET"])
 def regist_form():
     return render_template("/user/regist.html")
 
+
 # 회원 가입 처리
-
-
 @bp.route("/regist", methods=['POST'])
 def regist():
     data = request.get_json()
@@ -37,9 +35,8 @@ def regist():
 
     return reswrap.json_success(auth_key=user.regist_auth_key, user_id=user.id)
 
+
 # 회원 가입 이메일 확인
-
-
 @bp.route("/regist/verify/<user_id>/<regist_auth_key>", methods=['GET'])
 def regist_verify(user_id, regist_auth_key):
     user = User.select(id=user_id, regist_auth_key=regist_auth_key).first()
@@ -49,3 +46,29 @@ def regist_verify(user_id, regist_auth_key):
     user.save()
 
     return reswrap.json_success()
+
+
+# 로그인 폼
+@bp.route("/login", methods=["GET"])
+def login_form():
+    return render_template("/user/login.html")
+
+# 로그인 인증키 발송. 원칙대로라면 이메일을 보낸다. 지금 버전은 그냥 JSON 리턴함.
+@bp.route("/login", methods=["POST"])
+def login_send_auth_key():
+    data = request.get_json()
+    login_email = data['login_email']
+    user = User.first(login_email=login_email, regist_auth_complete_yn='Y')
+    if user is None:
+        return reswrap.json_fail("이메일이 없습니다.")
+    
+    user.login_auth_key = utils.generate_random_key(15)
+    user.login_auth_send_date = datetime.datetime.now()
+
+    user.save()
+
+    expired_date = user.login_auth_send_date + datetime.timedelta(hours=2) # 2시간 유효
+    expired_message = "이 링크는 " + expired_date.strftime("%Y년 %m월 %d일 %H시 %M분 %S초") + " 까지 유효합니다."
+
+    return reswrap.json_success(auth_key=user.login_auth_key, expired_message=expired_message)
+    
