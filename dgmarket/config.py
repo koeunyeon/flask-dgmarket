@@ -22,7 +22,7 @@ class TestConfig(Config):
     SECRET_KEY = "dgmarket_test_secret_key"
     SQLALCHEMY_DATABASE_URI = "sqlite:///{path}".format(
         path=os.path.join(base_dir, "dgmarket.test.sqlite"))
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 
 config_by_name = dict(
