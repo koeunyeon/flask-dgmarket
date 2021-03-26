@@ -1,5 +1,6 @@
 import datetime
 from flask import Blueprint, request, render_template, abort
+from flask_jwt_extended import create_access_token
 
 from ..models.user_model import User
 from ..common import reswrap
@@ -70,5 +71,24 @@ def login_send_auth_key():
     expired_date = user.login_auth_send_date + datetime.timedelta(hours=2) # 2시간 유효
     expired_message = "이 링크는 " + expired_date.strftime("%Y년 %m월 %d일 %H시 %M분 %S초") + " 까지 유효합니다."
 
-    return reswrap.json_success(auth_key=user.login_auth_key, expired_message=expired_message)
+    return reswrap.json_success(auth_key=user.login_auth_key, user_id=user.id, expired_date=expired_date.strftime("%Y%m%d%H%M%S"), expired_message=expired_message)
     
+
+# 실제 로그인 처리. JWT 리턴함.
+@bp.route("/login/verify/<user_id>/<login_auth_key>", methods=['GET'])
+def login_auth(user_id, login_auth_key):
+    user = User.select(id=user_id, login_auth_key=login_auth_key).first()
+    if user is None:
+        return reswrap.json_fail("로그인에 실패했습니다.")
+    
+    # 시간 만료 체크
+    expired_date = user.login_auth_send_date + datetime.timedelta(hours=2)
+    expired_date = float(expired_date.strftime("%Y%m%d%H%M%S"))
+
+    now_date = datetime.datetime.now()
+    now_date = float(now_date.strftime("%Y%m%d%H%M%S"))
+    if now_date > expired_date:
+        return reswrap.json_fail("로그인 시간이 만료되었습니다.")
+
+    access_token = create_access_token(identity=user.id, expires_delta=False) # expires_delta == False. 무제한.    
+    return reswrap.json_success(token=access_token)

@@ -1,6 +1,7 @@
 import pytest
 import dgmarket
 import json
+import datetime
 
 from dgmarket.models.user_model import User
 
@@ -16,7 +17,7 @@ def client():
 def setup_teardown():
     with dgmarket.create_app().app_context():
         # setup
-        print("setup")
+        # print("setup")
         User.query.delete()
         yield
         # teardown
@@ -145,14 +146,10 @@ def test_api_로그인_화면(client):
     assert html.status_code == 200
     assert 'id="login"' in str(html.get_data())
 
-
-def test_api_로그인_인증키_발송(client):
-    # given
-    # given
+def _회원가입후_인증까지(client, login_email="key@koeunyeon.com", nickname='고은연'):
     given_data = dict(
-        login_email="key@koeunyeon.com",
-        nickname='고은연'
-    )
+        login_email=login_email,
+        nickname=nickname    )
 
     given_result = _회원가입(client, **given_data)
     given_response_data = given_result.get_json()
@@ -164,7 +161,25 @@ def test_api_로그인_인증키_발송(client):
     # when
     data = json.dumps(
         dict(
-            login_email="key@koeunyeon.com"
+            login_email=login_email
+        )
+    )
+    result = client.post("/user/login", data=data,
+                         content_type='application/json')
+    return result
+
+
+def test_api_로그인_인증키_발송(client):    
+    # given
+    login_email="key@koeunyeon.com"
+    nickname='고은연'
+    
+    _회원가입후_인증까지(client, login_email, nickname)
+    
+    # when
+    data = json.dumps(
+        dict(
+            login_email=login_email
         )
     )
     result = client.post("/user/login", data=data,
@@ -172,4 +187,55 @@ def test_api_로그인_인증키_발송(client):
 
     # then
     assert result.status_code == 200
+    result_json = result.get_json()
+    assert result_json['result']
+    assert 'user_id' in result_json.keys()
+    assert 'expired_date' in result_json.keys()
+    assert 'auth_key' in result_json.keys() and len(result_json['auth_key']) == 15
+
+    expired_date = float(result_json['expired_date'])    
+    now_date = datetime.datetime.now()
+    now_date = float(now_date.strftime("%Y%m%d%H%M%S"))
+    assert expired_date > now_date
+
     #print(result.get_json())
+
+
+def test_api_로그인_인증_성공(client):
+    # given
+    login_email="key@koeunyeon.com"
+    nickname='고은연'
+    
+    _회원가입후_인증까지(client, login_email, nickname)
+
+    given_data = json.dumps(
+        dict(
+            login_email=login_email
+        )
+    )
+    given_result = client.post("/user/login", data=given_data,
+                         content_type='application/json')
+    
+    # when
+    given_result_json = given_result.get_json()    
+    auth_key = given_result_json['auth_key']    
+    user_id = given_result_json['user_id']
+
+    auth_link = f"/user/login/verify/{user_id}/{auth_key}"
+    
+    when_result = client.get(auth_link)
+    assert when_result.status_code == 200
+
+    when_result_json = when_result.get_json()
+
+    
+    assert when_result_json['result']
+    assert 'token' in when_result_json.keys()
+    assert when_result_json['token'] != None
+    
+
+    
+
+
+
+
