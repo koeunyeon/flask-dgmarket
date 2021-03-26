@@ -66,6 +66,8 @@ flask db upgrade
 `dgmarket.test.sqlite`
 
 # 단위 테스트
+set FLASK_APP=dgmarket
+set FLASK_ENV=test
 python -m pytest tests -v -rP
 
 # 모델이 변경되어서 db upgrade 한 번 더 했음.
@@ -79,3 +81,6 @@ flask db upgrade
 둘 다 해야 함.
 
 DB 스키마가 변경되었으므로 flask db migrate도 필요함
+
+# JWT 모듈 추가
+pip install flask-jwt-extended

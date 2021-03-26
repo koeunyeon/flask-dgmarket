@@ -1,18 +1,21 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 
 from . import config
 
 db = SQLAlchemy()
 migrate = Migrate()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(config.from_object())
     # init app
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db)    
+    jwt.init_app(app)
 
     # error handlers
     from .common import error_handlers
@@ -25,5 +28,6 @@ def create_app():
     from .views import user_bp
     app.register_blueprint(user_bp.bp)
 
+    
     
     return app
