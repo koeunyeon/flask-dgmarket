@@ -232,10 +232,50 @@ def test_api_로그인_인증_성공(client):
     assert when_result_json['result']
     assert 'token' in when_result_json.keys()
     assert when_result_json['token'] != None
+
+def _로그인_성공(client, login_email):
+    data = json.dumps(
+        dict(
+            login_email=login_email
+        )
+    )
+    authkey_result = client.post("/user/login", data=data,
+                         content_type='application/json')
+    
+    
+    authkey_result_json = authkey_result.get_json()    
+    auth_key = authkey_result_json['auth_key']    
+    user_id = authkey_result_json['user_id']
+
+    auth_link = f"/user/login/verify/{user_id}/{auth_key}"    
+    login_result = client.get(auth_link)
+    return login_result
+
+
+def _회원가입_인증_로그인_토큰_발급(client, login_email="key@koeunyeon.com", nickname='고은연'):    
+    _회원가입후_인증까지(client, login_email, nickname)
+    return _로그인_성공(client, login_email)
+
     
 
+def test_api_로그인_인증_JWT_체크(client):
+    # given
+    login_email="key@koeunyeon.com"
+    nickname='고은연'
+
+    login_result = _회원가입_인증_로그인_토큰_발급(client, login_email, nickname)
+    login_json = login_result.get_json()
+    token = login_json['token']
+
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    response = client.get('/user/login/check', headers=headers)
     
+    assert response.status_code == 200
+    assert response.get_json()['result']
+    assert 'user' in response.get_json().keys()
 
-
-
+    #print(headers)
+    #print (response.get_data())
 

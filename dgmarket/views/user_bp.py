@@ -1,6 +1,6 @@
 import datetime
 from flask import Blueprint, request, render_template, abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 from ..models.user_model import User
 from ..common import reswrap
@@ -92,3 +92,13 @@ def login_auth(user_id, login_auth_key):
 
     access_token = create_access_token(identity=user.id, expires_delta=False) # expires_delta == False. 무제한.    
     return reswrap.json_success(token=access_token)
+
+# 로그인 가능 여부 JWT 토큰 검증
+@bp.route("/login/check")
+@jwt_required()
+def login_check():
+    cur_user = get_jwt_identity()
+    if cur_user is None:
+        return reswrap.json_fail("토큰이 정상이 아닙니다.")
+
+    return reswrap.json_success(user = cur_user)
