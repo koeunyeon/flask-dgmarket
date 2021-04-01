@@ -33,3 +33,9 @@ class User(ModelBase):
     def regist_verify(self):
         self.regist_auth_complete_yn = 'Y'
         self.save()
+
+    # 로그인 인증키 발송
+    def login_send_auth_key(self):
+        self.login_auth_key = utils.generate_random_key(15)
+        self.login_auth_send_date = datetime.datetime.now()
+        self.save()

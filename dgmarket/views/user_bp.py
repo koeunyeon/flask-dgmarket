@@ -61,10 +61,7 @@ def login_send_auth_key():
     if user is None:
         return reswrap.json_fail("이메일이 없습니다.")
     
-    user.login_auth_key = utils.generate_random_key(15)
-    user.login_auth_send_date = datetime.datetime.now()
-
-    user.save()
+    user.login_send_auth_key()
 
     expired_date = user.login_auth_send_date + datetime.timedelta(hours=2) # 2시간 유효
     expired_message = "이 링크는 " + expired_date.strftime("%Y년 %m월 %d일 %H시 %M분 %S초") + " 까지 유효합니다."
