@@ -23,6 +23,7 @@ def create_app():
 
     # models
     from .models import user_model
+    from .models import product_model
 
     # blueprints
     from .views import user_bp

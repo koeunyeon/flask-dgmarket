@@ -84,3 +84,19 @@ DB 스키마가 변경되었으므로 flask db migrate도 필요함
 
 # JWT 모듈 추가
 pip install flask-jwt-extended
+
+
+# product 모델 추가
+다시 DB 업그레이드 함.
+set FLASK_ENV=development
+flask db migrate
+flask db upgrade
+
+set FLASK_ENV=test
+flask db migrate
+flask db upgrade
+
+`__init__.py`에 모델 추가하는 거 잊지 말 것.
+
+# 참고
+[sqlalchemy 컬럼 타입](https://docs.sqlalchemy.org/en/13/core/type_basics.html)
