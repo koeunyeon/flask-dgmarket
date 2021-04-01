@@ -77,12 +77,7 @@ def login_auth(user_id, login_auth_key):
         return reswrap.json_fail("로그인에 실패했습니다.")
     
     # 시간 만료 체크
-    expired_date = user.login_auth_send_date + datetime.timedelta(hours=2)
-    expired_date = float(expired_date.strftime("%Y%m%d%H%M%S"))
-
-    now_date = datetime.datetime.now()
-    now_date = float(now_date.strftime("%Y%m%d%H%M%S"))
-    if now_date > expired_date:
+    if user.is_login_auth_expired():
         return reswrap.json_fail("로그인 시간이 만료되었습니다.")
 
     access_token = create_access_token(identity=user.id, expires_delta=False) # expires_delta == False. 무제한.    

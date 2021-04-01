@@ -39,3 +39,14 @@ class User(ModelBase):
         self.login_auth_key = utils.generate_random_key(15)
         self.login_auth_send_date = datetime.datetime.now()
         self.save()
+
+    # 로그인 인증키 시간 경과 여부 확인
+    def is_login_auth_expired(self):        
+        expired_date = self.login_auth_send_date + datetime.timedelta(hours=2)
+        expired_date = float(expired_date.strftime("%Y%m%d%H%M%S"))
+
+        now_date = datetime.datetime.now()
+        now_date = float(now_date.strftime("%Y%m%d%H%M%S"))
+        return now_date > expired_date
+        
+            
