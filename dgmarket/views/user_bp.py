@@ -42,9 +42,8 @@ def regist_verify(user_id, regist_auth_key):
     user = User.select(id=user_id, regist_auth_key=regist_auth_key).first()
     if user is None:
         return reswrap.json_fail("회원이 없습니다.")
-    user.regist_auth_complete_yn = 'Y'
-    user.save()
-
+    
+    user.regist_verify()
     return reswrap.json_success()
 
 
