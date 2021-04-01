@@ -2,6 +2,7 @@ import datetime
 
 from .. import db
 from ..common.modelbase import ModelBase
+from ..common import utils
 
 
 class User(ModelBase):
@@ -20,4 +21,9 @@ class User(ModelBase):
     
     # 로그인키 보낸 시간.
     login_auth_send_date = db.Column(db.DateTime)
-        
+
+    def regist(self, login_email, nickname):
+        self.login_email = login_email
+        self.nickname = nickname
+        self.regist_auth_key = utils.generate_random_key()
+        self.save()

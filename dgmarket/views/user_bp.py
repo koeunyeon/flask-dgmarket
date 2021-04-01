@@ -30,9 +30,8 @@ def regist():
         # return abort(400, description="이미 존재하는 별명입니다.")
         return reswrap.json_fail("이미 존재하는 별명입니다.")
 
-    user = User(login_email=login_email, nickname=nickname)
-    user.regist_auth_key = utils.generate_random_key()
-    user.save()
+    user = User()
+    user.regist(login_email, nickname)
 
     return reswrap.json_success(auth_key=user.regist_auth_key, user_id=user.id)
 
