@@ -23,11 +23,9 @@ def regist():
     nickname = data['nickname']
 
     if User.exist(login_email=login_email):
-        # return abort(400, description="이미 존재하는 이메일입니다.")
         return reswrap.json_fail("이미 존재하는 이메일입니다.")
 
-    if User.exist(nickname=nickname):
-        # return abort(400, description="이미 존재하는 별명입니다.")
+    if User.exist(nickname=nickname):        
         return reswrap.json_fail("이미 존재하는 별명입니다.")
 
     user = User()
@@ -61,9 +59,7 @@ def login_send_auth_key():
     if user is None:
         return reswrap.json_fail("이메일이 없습니다.")
     
-    user.login_send_auth_key()
-
-    expired_date = user.login_auth_send_date + datetime.timedelta(hours=2) # 2시간 유효
+    expired_date = user.login_send_auth_key()
     expired_message = "이 링크는 " + expired_date.strftime("%Y년 %m월 %d일 %H시 %M분 %S초") + " 까지 유효합니다."
 
     return reswrap.json_success(auth_key=user.login_auth_key, user_id=user.id, expired_date=expired_date.strftime("%Y%m%d%H%M%S"), expired_message=expired_message)

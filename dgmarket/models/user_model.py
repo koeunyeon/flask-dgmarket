@@ -40,6 +40,10 @@ class User(ModelBase):
         self.login_auth_send_date = datetime.datetime.now()
         self.save()
 
+        expired_date = self.login_auth_send_date + datetime.timedelta(hours=2)
+        return expired_date
+
+
     # 로그인 인증키 시간 경과 여부 확인
     def is_login_auth_expired(self):        
         expired_date = self.login_auth_send_date + datetime.timedelta(hours=2)
