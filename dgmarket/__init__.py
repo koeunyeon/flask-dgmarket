@@ -29,6 +29,11 @@ def create_app():
     from .views import user_bp
     app.register_blueprint(user_bp.bp)
 
-    
-    
+    from .views import product_bp
+    app.register_blueprint(product_bp.bp)
+
+
+    # extentions
+    import wtforms_json
+    wtforms_json.init()    
     return app

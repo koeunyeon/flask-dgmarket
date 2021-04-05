@@ -100,3 +100,15 @@ flask db upgrade
 
 # 참고
 [sqlalchemy 컬럼 타입](https://docs.sqlalchemy.org/en/13/core/type_basics.html)
+[wtforms validator](https://wtforms.readthedocs.io/en/2.3.x/validators/)
+
+
+# wtforms
+```
+pip install flask-wtf
+```
+
+# 상품만 단위 테스트
+set FLASK_APP=dgmarket
+set FLASK_ENV=test
+python -m pytest tests/product_test.py -v -rP
